@@ -1,0 +1,44 @@
+[
+  {
+    "id": "resume",
+    "icon": "📄",
+    "title": "Professional Resume Writing",
+    "description": "We craft a DevOps-tailored resume that gets past ATS filters and impresses hiring managers — with the right keywords, structure, and project highlights.",
+    "paid": true
+  },
+  {
+    "id": "linkedin",
+    "icon": "💼",
+    "title": "LinkedIn Profile Optimization",
+    "description": "Transform your LinkedIn into a recruiter magnet. Headline, summary, skills, and featured section — all optimized for DevOps roles and maximum visibility.",
+    "paid": true
+  },
+  {
+    "id": "portfolio",
+    "icon": "🌐",
+    "title": "Portfolio Website",
+    "description": "Get a stunning developer portfolio showcasing your AWS projects, GitHub repos, and DevOps skills. First impressions that stand out to employers.",
+    "paid": true
+  },
+  {
+    "id": "job",
+    "icon": "🤝",
+    "title": "Job Search Support",
+    "description": "Mock interviews, application strategy, job referrals, and direct support through your entire job hunt — until you land your first DevOps role.",
+    "paid": true
+  },
+  {
+    "id": "mentorship",
+    "icon": "🎓",
+    "title": "Course + 1:1 Mentorship",
+    "description": "Dedicated support sessions during your learning journey. Ask anything, review projects, get unblocked — available at your scheduled time slot.",
+    "paid": false
+  },
+  {
+    "id": "certificate",
+    "icon": "🏆",
+    "title": "Certificate of Completion",
+    "description": "A verifiable certificate upon completing all 27 modules — shareable on LinkedIn and recognized by hiring partners in the DevOps ecosystem.",
+    "paid": false
+  }
+]

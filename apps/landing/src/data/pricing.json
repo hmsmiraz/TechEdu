@@ -1,0 +1,71 @@
+[
+  {
+    "id": "monthly",
+    "plan": "Monthly",
+    "price": 150,
+    "unit": "/mo",
+    "period": "Billed monthly · Cancel anytime",
+    "featured": false,
+    "badge": null,
+    "saving": null,
+    "features": [
+      "Full 27-module curriculum",
+      "Live & recorded classes",
+      "1-on-1 support sessions",
+      "Project feedback",
+      "Project-based learning",
+      "Hands-on labs",
+      "Production-level best practices",
+      "Mock interviews & assessment tests",
+      "Internship/job preparation support",
+      "Resume, LinkedIn & Portfolio building",
+      "Certificate of completion"
+    ]
+  },
+  {
+    "id": "yearly",
+    "plan": "Yearly",
+    "price": 500,
+    "unit": "/Installment",
+    "period": "3 Installments of $500 · every 2 months · Total $1,500",
+    "featured": true,
+    "badge": "Most Popular",
+    "saving": "💜 Same total as monthly — pay in 3 easy Installments",
+    "features": [
+      "Full 27-module curriculum",
+      "Live & recorded classes",
+      "1-on-1 support sessions",
+      "Project feedback",
+      "Project-based learning",
+      "Hands-on labs",
+      "Production-level best practices",
+      "Mock interviews & assessment tests",
+      "Internship/job preparation support",
+      "Resume, LinkedIn & Portfolio building",
+      "Certificate of completion"
+    ]
+  },
+  {
+    "id": "lifetime",
+    "plan": "One-Time Payment",
+    "price": 1200,
+    "unit": "",
+    "period": "Pay once · Own it forever · Save $300",
+    "featured": false,
+    "badge": null,
+    "saving": "✨ Save $300 vs the yearly plan — best value",
+    "features": [
+      "Full 27-module curriculum",
+      "Live & recorded classes",
+      "1-on-1 support sessions",
+      "Project feedback",
+      "Project-based learning",
+      "Hands-on labs",
+      "Production-level best practices",
+      "Mock interviews & assessment tests",
+      "Internship/job preparation support",
+      "Resume, LinkedIn & Portfolio building",
+      "Certificate of completion"
+    ]
+  }
+]

@@ -1,0 +1,17 @@
+[
+  {
+    "id": "miraz",
+    "name": "Hassan Md. Sharfuddin Miraz",
+    "role": "DevOps Engineer · Founder, TechEdu",
+    "initials": "HM",
+    "bio": "DevOps Engineer at SDB IT, Uttara, Dhaka. Expert in AWS, Kubernetes, Terraform, CI/CD pipelines & container orchestration. Published IEEE researcher in ML & AI. Has architected and deployed production systems powering 50,000+ concurrent users. Passionate about helping career changers break into DevOps with real mentorship — not just videos.",
+    "skills": ["AWS", "Kubernetes", "Docker", "Terraform", "GitLab CI/CD", "ArgoCD", "Prometheus", "Ansible", "Linux", "Jenkins"],
+    "links": {
+      "portfolio": "https://hmsmiraz.vercel.app/",
+      "github": "https://github.com/hmsmiraz",
+      "gitlab": "https://gitlab.com/hmsmiraz",
+      "linkedin": "https://linkedin.com/in/hassan-md-sharfuddin-miraz-51b254172",
+      "booking": "https://calendar.app.google/51mxwqvx47gihDYu6"
+    }
+  }
+]

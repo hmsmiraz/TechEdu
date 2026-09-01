@@ -1,0 +1,21 @@
+{
+  "name": "TechEdu",
+  "tagline": "Master DevOps. Change Your Career.",
+  "description": "TechEdu is a hands-on, AI-enhanced DevOps course with dedicated 1-on-1 mentorship. From Linux fundamentals to Kubernetes, Terraform & GitOps — plus resume, portfolio & job support to land your first role.",
+  "bookingUrl": "https://calendar.app.google/51mxwqvx47gihDYu6",
+  "portfolioUrl": "https://hmsmiraz.vercel.app/",
+  "email": "hassan.sharfuddin.miraz@gmail.com",
+  "phone": "+880 1835 964 977",
+  "whatsapp": "https://wa.me/8801835964977",
+  "location": "Uttara, Dhaka, Bangladesh",
+  "github": "https://github.com/hmsmiraz",
+  "gitlab": "https://gitlab.com/hmsmiraz",
+  "linkedin": "https://linkedin.com/in/hassan-md-sharfuddin-miraz-51b254172",
+  "stats": [
+    { "value": "27", "label": "Modules" },
+    { "value": "1:1", "label": "Support" },
+    { "value": "AI", "label": "Enhanced" },
+    { "value": "Live", "label": "+ Recorded" },
+    { "value": "Job", "label": "Ready" }
+  ]
+}

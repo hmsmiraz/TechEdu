@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "title": "Using AI Tools in Your Daily DevOps Workflow",
+    "description": "Learn how to use ChatGPT, GitHub Copilot, and other AI tools to write scripts, debug pipelines, generate Terraform configs, and speed up your day-to-day DevOps tasks professionally."
+  },
+  {
+    "id": 2,
+    "title": "AI-Assisted Troubleshooting & Debugging",
+    "description": "Use AI to diagnose Kubernetes errors, interpret logs, and fix broken CI/CD pipelines faster. We'll show you real workflows used by senior engineers at top companies."
+  },
+  {
+    "id": 3,
+    "title": "Writing Infrastructure Code with AI",
+    "description": "Generate and review Dockerfiles, Helm charts, Ansible playbooks, and Terraform modules using AI — then learn how to validate, test, and trust what it produces."
+  },
+  {
+    "id": 4,
+    "title": "AI for Learning Concepts Faster",
+    "description": "Use AI as a study companion — ask it to explain concepts, quiz you on what you've learned, simplify documentation, and help you go from confused to confident on any topic."
+  }
+]

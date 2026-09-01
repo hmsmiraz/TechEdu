@@ -1,0 +1,22 @@
+[
+  {
+    "icon": "🎯",
+    "title": "1-on-1 Mentorship Sessions",
+    "description": "Book sessions with Miraz at your scheduled time. Get unstuck fast — no waiting in queues, no generic answers."
+  },
+  {
+    "icon": "🤖",
+    "title": "AI-Enhanced Learning",
+    "description": "Personalized learning paths, AI quiz generation, instant doubt resolution — adapt the course to how you learn best."
+  },
+  {
+    "icon": "📡",
+    "title": "Live & Recorded Classes",
+    "description": "Attend live for real-time interaction, or catch recorded sessions at your own pace. Both formats, every topic."
+  },
+  {
+    "icon": "🚀",
+    "title": "Real AWS Projects",
+    "description": "Deploy production-grade 2-tier & 3-tier apps on EC2, EKS, VPC & RDS — not sandbox toy examples."
+  }
+]
