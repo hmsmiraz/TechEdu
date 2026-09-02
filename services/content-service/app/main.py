@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
+from .telemetry import setup_telemetry
 from .database import Base, engine
 from .routers import modules, admin_content
 
@@ -29,6 +30,7 @@ app.add_middleware(
 
 app.include_router(modules.router)
 app.include_router(admin_content.router)
+setup_telemetry(app, engine, service_name="content-service")
 
 
 @app.get("/health")

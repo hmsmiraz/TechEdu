@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from .telemetry import setup_telemetry
 from .database import Base, engine, SessionLocal
 from .models import User, UserRole, UserStatus
 from .security import hash_password
@@ -36,6 +36,7 @@ app.add_middleware(
 
 app.include_router(auth.router)
 app.include_router(admin_users.router)
+setup_telemetry(app, engine, service_name="auth-service")
 
 
 def _bootstrap_admin():
