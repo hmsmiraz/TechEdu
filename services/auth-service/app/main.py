@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .telemetry import setup_telemetry
-from .database import Base, engine, SessionLocal
+from .database import Base, engine, SessionLocal, wait_for_db
 from .models import User, UserRole, UserStatus
 from .security import hash_password
 from .routers import auth, admin_users
@@ -16,6 +16,7 @@ logger = logging.getLogger("auth-service")
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # NOTE: for local dev only. Swap for Alembic migrations before production.
+    wait_for_db()
     Base.metadata.create_all(bind=engine)
     _bootstrap_admin()
     _check_jwt_secret_strength()

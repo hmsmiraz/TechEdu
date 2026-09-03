@@ -5,13 +5,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from .telemetry import setup_telemetry
-from .database import Base, engine
+from .database import Base, engine, wait_for_db
 from .routers import modules, admin_content
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # NOTE: for local dev only. Swap for Alembic migrations before production.
+    wait_for_db()
     Base.metadata.create_all(bind=engine)
     yield
 
