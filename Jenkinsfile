@@ -79,7 +79,7 @@ pipeline {
                 stage('auth-service image') {
                     steps {
                         sh '''
-                            docker build \
+                            docker build --provenance=false --sbom=false \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-auth-service:${BRANCH_TAG} \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-auth-service:${BUILD_TAG_FULL} \
                               ./services/auth-service
@@ -89,7 +89,7 @@ pipeline {
                 stage('content-service image') {
                     steps {
                         sh '''
-                            docker build \
+                            docker build --provenance=false --sbom=false \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-content-service:${BRANCH_TAG} \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-content-service:${BUILD_TAG_FULL} \
                               ./services/content-service
@@ -99,7 +99,7 @@ pipeline {
                 stage('gateway image') {
                     steps {
                         sh '''
-                            docker build \
+                            docker build --provenance=false --sbom=false \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-gateway:${BRANCH_TAG} \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-gateway:${BUILD_TAG_FULL} \
                               ./services/gateway
@@ -109,7 +109,7 @@ pipeline {
                 stage('landing image') {
                     steps {
                         sh '''
-                            docker build \
+                            docker build --provenance=false --sbom=false \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-landing:${BRANCH_TAG} \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-landing:${BUILD_TAG_FULL} \
                               --build-arg NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api \
@@ -121,7 +121,7 @@ pipeline {
                 stage('admin image') {
                     steps {
                         sh '''
-                            docker build \
+                            docker build --provenance=false --sbom=false \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-admin:${BRANCH_TAG} \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-admin:${BUILD_TAG_FULL} \
                               --build-arg NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api \
@@ -132,7 +132,7 @@ pipeline {
                 stage('learning-portal image') {
                     steps {
                         sh '''
-                            docker build \
+                            docker build --provenance=false --sbom=false \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-learning-portal:${BRANCH_TAG} \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-learning-portal:${BUILD_TAG_FULL} \
                               --build-arg NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api \
