@@ -18,6 +18,26 @@ services:
       timeout: 5s
       retries: 10
 
+  observability-agent:
+    image: grafana/alloy:v1.5.1
+    restart: unless-stopped
+    command: ["run", "/etc/alloy/config.alloy", "--server.http.listen-addr=0.0.0.0:12345", "--storage.path=/var/lib/alloy/data"]
+    volumes:
+      - ./observability/agent/config.alloy:/etc/alloy/config.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - alloy-data:/var/lib/alloy/data
+    environment:
+      REMOTE_TEMPO_OTLP_ENDPOINT: ${REMOTE_TEMPO_OTLP_ENDPOINT:-}
+      REMOTE_TEMPO_USERNAME: ${REMOTE_TEMPO_USERNAME:-}
+      REMOTE_TEMPO_PASSWORD: ${REMOTE_TEMPO_PASSWORD:-}
+      REMOTE_TLS_INSECURE: ${REMOTE_TLS_INSECURE:-false}
+      REMOTE_PROMETHEUS_URL: ${REMOTE_PROMETHEUS_URL:-}
+      REMOTE_PROMETHEUS_USERNAME: ${REMOTE_PROMETHEUS_USERNAME:-}
+      REMOTE_PROMETHEUS_PASSWORD: ${REMOTE_PROMETHEUS_PASSWORD:-}
+      REMOTE_LOKI_URL: ${REMOTE_LOKI_URL:-}
+      REMOTE_LOKI_USERNAME: ${REMOTE_LOKI_USERNAME:-}
+      REMOTE_LOKI_PASSWORD: ${REMOTE_LOKI_PASSWORD:-}
+
   auth-service:
     build: ./services/auth-service
     restart: unless-stopped
@@ -28,7 +48,7 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
       CORS_ORIGINS: ${CORS_ORIGINS}
-      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://observability-agent:4318
     depends_on:
       mysql:
         condition: service_healthy
@@ -46,7 +66,7 @@ services:
       DATABASE_URL: mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/content_db
       JWT_SECRET: ${JWT_SECRET}
       CORS_ORIGINS: ${CORS_ORIGINS}
-      OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://observability-agent:4318
     depends_on:
       mysql:
         condition: service_healthy
@@ -110,3 +130,4 @@ services:
 
 volumes:
   mysql-data:
+  alloy-data:

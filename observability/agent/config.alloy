@@ -1,0 +1,107 @@
+// ============================================================================
+// TechEdu LMS — observability agent (Grafana Alloy)
+//
+// Runs on this VM, collects telemetry from the local services, and ships
+// everything to your central/master Grafana stack. Nothing is stored
+// locally — this is a forwarder, not a full observability backend.
+//
+// All remote endpoints/credentials come from environment variables (set
+// in .env) so this file never needs editing per-environment.
+// ============================================================================
+
+// ---- Receive OTLP traces + metrics from auth-service and content-service ----
+otelcol.receiver.otlp "app_services" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+  output {
+    metrics = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.processor.batch "default" {
+  output {
+    metrics = [otelcol.exporter.prometheus.to_remote_write.input]
+    traces  = [otelcol.exporter.otlp.to_tempo.input]
+  }
+}
+
+// ---- Traces -> remote Tempo (or any OTLP-compatible trace backend) on your master ----
+otelcol.exporter.otlp "to_tempo" {
+  client {
+    endpoint = sys.env("REMOTE_TEMPO_OTLP_ENDPOINT")
+
+    auth = otelcol.auth.basic.tempo_auth.handler
+
+    tls {
+      insecure = sys.env("REMOTE_TLS_INSECURE") == "true"
+    }
+  }
+}
+
+otelcol.auth.basic "tempo_auth" {
+  username = sys.env("REMOTE_TEMPO_USERNAME")
+  password = sys.env("REMOTE_TEMPO_PASSWORD")
+}
+
+// ---- Metrics -> convert OTLP to Prometheus remote_write for your master ----
+otelcol.exporter.prometheus "to_remote_write" {
+  forward_to = [prometheus.remote_write.to_master.receiver]
+}
+
+prometheus.remote_write "to_master" {
+  endpoint {
+    url = sys.env("REMOTE_PROMETHEUS_URL")
+
+    basic_auth {
+      username = sys.env("REMOTE_PROMETHEUS_USERNAME")
+      password = sys.env("REMOTE_PROMETHEUS_PASSWORD")
+    }
+  }
+}
+
+// ---- Logs -> discover every container on this VM, tail their logs, ship to Loki on your master ----
+discovery.docker "containers" {
+  host = "unix:///var/run/docker.sock"
+}
+
+// Docker's default json-file log driver doesn't record which container a
+// line came from once read raw, so relabel useful metadata (container
+// name, image) onto each log line before shipping it — makes filtering
+// by service in Grafana's Loki explorer actually usable.
+discovery.relabel "containers" {
+  targets = discovery.docker.containers.targets
+
+  rule {
+    source_labels = ["__meta_docker_container_name"]
+    regex         = "/(.*)"
+    target_label  = "container"
+  }
+
+  rule {
+    source_labels = ["__meta_docker_container_log_stream"]
+    target_label  = "stream"
+  }
+}
+
+loki.source.docker "default" {
+  host       = "unix:///var/run/docker.sock"
+  targets    = discovery.docker.containers.targets
+  relabel_rules = discovery.relabel.containers.rules
+  forward_to = [loki.write.to_master.receiver]
+}
+
+loki.write "to_master" {
+  endpoint {
+    url = sys.env("REMOTE_LOKI_URL")
+
+    basic_auth {
+      username = sys.env("REMOTE_LOKI_USERNAME")
+      password = sys.env("REMOTE_LOKI_PASSWORD")
+    }
+  }
+}
