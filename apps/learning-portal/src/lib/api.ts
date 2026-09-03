@@ -1,4 +1,4 @@
-import { CONTENT_API_URL } from "./config";
+import { API_BASE_URL } from "./config";
 
 export type Resource = {
   id: number;
@@ -20,7 +20,7 @@ export type Module = {
 export class UnauthorizedError extends Error {}
 
 export async function fetchModules(token: string): Promise<Module[]> {
-  const res = await fetch(`${CONTENT_API_URL}/modules`, {
+  const res = await fetch(`${API_BASE_URL}/modules`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 

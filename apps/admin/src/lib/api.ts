@@ -1,4 +1,4 @@
-import { AUTH_API_URL, CONTENT_API_URL } from "./config";
+import { API_BASE_URL } from "./config";
 
 export type UserStatus = "pending" | "approved" | "rejected";
 export type UserRole = "student" | "admin";
@@ -63,24 +63,24 @@ async function request<T>(
 }
 
 export function login(email: string, password: string): Promise<LoginResponse> {
-  return request(`${AUTH_API_URL}/auth/login`, null, {
+  return request(`${API_BASE_URL}/auth/login`, null, {
     method: "POST",
     body: JSON.stringify({ email, password }),
   });
 }
 
 export function listUsers(token: string): Promise<User[]> {
-  return request(`${AUTH_API_URL}/admin/users`, token);
+  return request(`${API_BASE_URL}/admin/users`, token);
 }
 
 export function approveUser(token: string, userId: number): Promise<User> {
-  return request(`${AUTH_API_URL}/admin/users/${userId}/approve`, token, {
+  return request(`${API_BASE_URL}/admin/users/${userId}/approve`, token, {
     method: "PATCH",
   });
 }
 
 export function rejectUser(token: string, userId: number): Promise<User> {
-  return request(`${AUTH_API_URL}/admin/users/${userId}/reject`, token, {
+  return request(`${API_BASE_URL}/admin/users/${userId}/reject`, token, {
     method: "PATCH",
   });
 }
@@ -90,27 +90,27 @@ export function updateUser(
   userId: number,
   payload: Partial<Pick<User, "name" | "email" | "role">>
 ): Promise<User> {
-  return request(`${AUTH_API_URL}/admin/users/${userId}`, token, {
+  return request(`${API_BASE_URL}/admin/users/${userId}`, token, {
     method: "PUT",
     body: JSON.stringify(payload),
   });
 }
 
 export function deleteUser(token: string, userId: number): Promise<void> {
-  return request(`${AUTH_API_URL}/admin/users/${userId}`, token, {
+  return request(`${API_BASE_URL}/admin/users/${userId}`, token, {
     method: "DELETE",
   });
 }
 
 export function listModules(token: string): Promise<Module[]> {
-  return request(`${CONTENT_API_URL}/modules`, token);
+  return request(`${API_BASE_URL}/modules`, token);
 }
 
 export function createModule(
   token: string,
   payload: { title: string; description?: string; order?: number }
 ): Promise<Module> {
-  return request(`${CONTENT_API_URL}/admin/modules`, token, {
+  return request(`${API_BASE_URL}/admin/modules`, token, {
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -121,14 +121,14 @@ export function updateModule(
   moduleId: number,
   payload: Partial<{ title: string; description: string; order: number }>
 ): Promise<Module> {
-  return request(`${CONTENT_API_URL}/admin/modules/${moduleId}`, token, {
+  return request(`${API_BASE_URL}/admin/modules/${moduleId}`, token, {
     method: "PUT",
     body: JSON.stringify(payload),
   });
 }
 
 export function deleteModule(token: string, moduleId: number): Promise<void> {
-  return request(`${CONTENT_API_URL}/admin/modules/${moduleId}`, token, {
+  return request(`${API_BASE_URL}/admin/modules/${moduleId}`, token, {
     method: "DELETE",
   });
 }
@@ -138,14 +138,14 @@ export function createResource(
   moduleId: number,
   payload: { type: "video" | "doc"; title: string; url: string; order?: number }
 ): Promise<Resource> {
-  return request(`${CONTENT_API_URL}/admin/modules/${moduleId}/resources`, token, {
+  return request(`${API_BASE_URL}/admin/modules/${moduleId}/resources`, token, {
     method: "POST",
     body: JSON.stringify(payload),
   });
 }
 
 export function deleteResource(token: string, resourceId: number): Promise<void> {
-  return request(`${CONTENT_API_URL}/admin/resources/${resourceId}`, token, {
+  return request(`${API_BASE_URL}/admin/resources/${resourceId}`, token, {
     method: "DELETE",
   });
 }
