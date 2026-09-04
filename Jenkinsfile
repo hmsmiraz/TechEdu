@@ -200,9 +200,22 @@ pipeline {
 
                     kubectl apply -k k8s/overlays/${BRANCH_NAME}
 
-                    for deploy in auth-service content-service gateway landing admin learning-portal; do
-                        kubectl rollout restart deployment/${deploy} -n ${BRANCH_NAME}
-                    done
+                    # Deploy the immutable build-numbered tag, not the mutable
+                    # branch tag — GKE's pull-through cache for DockerHub can
+                    # serve stale content for a reused tag even with
+                    # imagePullPolicy: Always, since Always only forces asking
+                    # again, it doesn't bypass caching further up the pull
+                    # path. A tag that has never existed before can't be
+                    # stale, so this sidesteps the problem entirely, and gives
+                    # exact rollback capability as a bonus. kubectl set image
+                    # is itself a real spec change, so it triggers its own
+                    # rollout — no separate rollout restart needed.
+                    kubectl set image deployment/auth-service auth-service=${DOCKERHUB_NAMESPACE}/techedu-auth-service:${BUILD_TAG_FULL} -n ${BRANCH_NAME}
+                    kubectl set image deployment/content-service content-service=${DOCKERHUB_NAMESPACE}/techedu-content-service:${BUILD_TAG_FULL} -n ${BRANCH_NAME}
+                    kubectl set image deployment/gateway gateway=${DOCKERHUB_NAMESPACE}/techedu-gateway:${BUILD_TAG_FULL} -n ${BRANCH_NAME}
+                    kubectl set image deployment/landing landing=${DOCKERHUB_NAMESPACE}/techedu-landing:${BUILD_TAG_FULL} -n ${BRANCH_NAME}
+                    kubectl set image deployment/admin admin=${DOCKERHUB_NAMESPACE}/techedu-admin:${BUILD_TAG_FULL} -n ${BRANCH_NAME}
+                    kubectl set image deployment/learning-portal learning-portal=${DOCKERHUB_NAMESPACE}/techedu-learning-portal:${BUILD_TAG_FULL} -n ${BRANCH_NAME}
 
                     for deploy in auth-service content-service gateway landing admin learning-portal; do
                         kubectl rollout status deployment/${deploy} -n ${BRANCH_NAME} --timeout=180s
