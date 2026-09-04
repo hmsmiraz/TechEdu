@@ -179,9 +179,21 @@ pipeline {
                     sh '''
                         echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
+                        push_with_retry() {
+                            for attempt in 1 2 3; do
+                                if docker push "$1"; then
+                                    return 0
+                                fi
+                                echo "Push failed (attempt $attempt/3) for $1 — retrying in 5s..."
+                                sleep 5
+                            done
+                            echo "Push failed after 3 attempts for $1"
+                            return 1
+                        }
+
                         for image in techedu-auth-service techedu-content-service techedu-gateway techedu-landing techedu-admin techedu-learning-portal; do
-                            docker push ${DOCKERHUB_NAMESPACE}/${image}:${BRANCH_TAG}
-                            docker push ${DOCKERHUB_NAMESPACE}/${image}:${BUILD_TAG_FULL}
+                            push_with_retry ${DOCKERHUB_NAMESPACE}/${image}:${BRANCH_TAG}
+                            push_with_retry ${DOCKERHUB_NAMESPACE}/${image}:${BUILD_TAG_FULL}
                         done
 
                         docker logout
