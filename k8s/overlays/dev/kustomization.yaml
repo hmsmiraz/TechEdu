@@ -34,7 +34,7 @@ secretGenerator:
 configMapGenerator:
   - name: app-config
     literals:
-      - cors-origins=http://REPLACE_WITH_RESERVED_IP:3000,http://REPLACE_WITH_RESERVED_IP:3001,http://REPLACE_WITH_RESERVED_IP:3002
+      - cors-origins=http://34.47.173.69:3000,http://34.47.173.69:3001,http://34.47.173.69:3002
 
 patches:
   - target:
@@ -43,28 +43,28 @@ patches:
     patch: |-
       - op: replace
         path: /spec/loadBalancerIP
-        value: "REPLACE_WITH_RESERVED_IP"
+        value: "34.47.173.69"
   - target:
       kind: Service
       name: landing
     patch: |-
       - op: replace
         path: /spec/loadBalancerIP
-        value: "REPLACE_WITH_RESERVED_IP"
+        value: "34.47.173.69"
   - target:
       kind: Service
       name: admin
     patch: |-
       - op: replace
         path: /spec/loadBalancerIP
-        value: "REPLACE_WITH_RESERVED_IP"
+        value: "34.47.173.69"
   - target:
       kind: Service
       name: learning-portal
     patch: |-
       - op: replace
         path: /spec/loadBalancerIP
-        value: "REPLACE_WITH_RESERVED_IP"
+        value: "34.47.173.69"
   # dev: small, cheap, standard storage — genuinely disposable, no backup
   # strategy needed. Losing this data is a non-event.
   - target:
