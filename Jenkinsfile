@@ -1,3 +1,12 @@
+def namespaceIp(branch) {
+    def ips = [
+        dev: '34.47.173.69',
+        staging: '8.231.99.218',
+        main: '8.231.68.147'
+    ]
+    return ips[branch]
+}
+
 pipeline {
     agent any
 
@@ -10,6 +19,10 @@ pipeline {
         // e.g. "dev" or "dev-42" — computed once, reused everywhere below.
         BRANCH_TAG = "${env.BRANCH_NAME}"
         BUILD_TAG_FULL = "${env.BRANCH_NAME}-${env.BUILD_NUMBER}"
+        GKE_CLUSTER = 'techedu-cluster'
+        GKE_ZONE = 'asia-south1-c'
+        GCP_PROJECT = 'miraz001'
+        USE_GKE_GCLOUD_AUTH_PLUGIN = 'True'
     }
 
     options {
@@ -18,6 +31,18 @@ pipeline {
     }
 
     stages {
+        stage('Determine deployment target') {
+            steps {
+                script {
+                    env.NAMESPACE_IP = namespaceIp(env.BRANCH_NAME)
+                    if (env.NAMESPACE_IP == null) {
+                        error "No reserved IP mapped for branch '${env.BRANCH_NAME}' — add it to namespaceIp() at the top of this Jenkinsfile."
+                    }
+                    echo "Branch ${env.BRANCH_NAME} -> namespace ${env.BRANCH_NAME}, IP ${env.NAMESPACE_IP}"
+                }
+            }
+        }
+
         stage('Frontend builds') {
             parallel {
                 stage('landing') {
@@ -112,8 +137,8 @@ pipeline {
                             docker build --provenance=false --sbom=false \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-landing:${BRANCH_TAG} \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-landing:${BUILD_TAG_FULL} \
-                              --build-arg NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api \
-                              --build-arg NEXT_PUBLIC_LEARNING_PORTAL_URL=http://localhost:3002 \
+                              --build-arg NEXT_PUBLIC_API_BASE_URL=http://${NAMESPACE_IP}:8080/api \
+                              --build-arg NEXT_PUBLIC_LEARNING_PORTAL_URL=http://${NAMESPACE_IP}:3002 \
                               ./apps/landing
                         '''
                     }
@@ -124,7 +149,7 @@ pipeline {
                             docker build --provenance=false --sbom=false \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-admin:${BRANCH_TAG} \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-admin:${BUILD_TAG_FULL} \
-                              --build-arg NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api \
+                              --build-arg NEXT_PUBLIC_API_BASE_URL=http://${NAMESPACE_IP}:8080/api \
                               ./apps/admin
                         '''
                     }
@@ -135,8 +160,8 @@ pipeline {
                             docker build --provenance=false --sbom=false \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-learning-portal:${BRANCH_TAG} \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-learning-portal:${BUILD_TAG_FULL} \
-                              --build-arg NEXT_PUBLIC_API_BASE_URL=http://localhost:8080/api \
-                              --build-arg NEXT_PUBLIC_LANDING_URL=http://localhost:3000 \
+                              --build-arg NEXT_PUBLIC_API_BASE_URL=http://${NAMESPACE_IP}:8080/api \
+                              --build-arg NEXT_PUBLIC_LANDING_URL=http://${NAMESPACE_IP}:3000 \
                               ./apps/learning-portal
                         '''
                     }
@@ -164,18 +189,43 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                sh '''
+                    gcloud container clusters get-credentials ${GKE_CLUSTER} --zone=${GKE_ZONE} --project=${GCP_PROJECT}
+
+                    cp /var/lib/jenkins/techedu-secrets/${BRANCH_NAME}/mysql-secret.env k8s/overlays/${BRANCH_NAME}/mysql-secret.env
+                    cp /var/lib/jenkins/techedu-secrets/${BRANCH_NAME}/app-secret.env k8s/overlays/${BRANCH_NAME}/app-secret.env
+
+                    kubectl apply -k k8s/overlays/${BRANCH_NAME}
+
+                    for deploy in auth-service content-service gateway landing admin learning-portal; do
+                        kubectl rollout restart deployment/${deploy} -n ${BRANCH_NAME}
+                    done
+
+                    for deploy in auth-service content-service gateway landing admin learning-portal; do
+                        kubectl rollout status deployment/${deploy} -n ${BRANCH_NAME} --timeout=180s
+                    done
+                '''
+            }
+        }
     }
 
     post {
         always {
             echo "Branch: ${env.BRANCH_NAME} — Build #${env.BUILD_NUMBER} — Result: ${currentBuild.currentResult}"
-            sh 'docker image prune -f || true'
+            sh '''
+                docker image prune -f || true
+                rm -f k8s/overlays/${BRANCH_NAME}/mysql-secret.env
+                rm -f k8s/overlays/${BRANCH_NAME}/app-secret.env
+            '''
         }
         success {
-            echo "CI passed and images pushed for ${env.BRANCH_NAME}: tags ${env.BRANCH_TAG} and ${env.BUILD_TAG_FULL}. Deployment steps not configured yet — coming later."
+            echo "CI+CD passed for ${env.BRANCH_NAME}: images tagged ${env.BRANCH_TAG}/${env.BUILD_TAG_FULL}, deployed to namespace ${env.BRANCH_NAME} at ${env.NAMESPACE_IP}."
         }
         failure {
-            echo "CI failed on ${env.BRANCH_NAME} — check the stage logs above for which part broke."
+            echo "Pipeline failed on ${env.BRANCH_NAME} — check the stage logs above for which part broke."
         }
     }
 }

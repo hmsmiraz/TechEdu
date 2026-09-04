@@ -11,3 +11,5 @@ venv/
 *.db
 mysql-data/
 *.log
+k8s/overlays/*/mysql-secret.env
+k8s/overlays/*/app-secret.env

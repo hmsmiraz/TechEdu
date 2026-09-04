@@ -1,0 +1,82 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: main
+
+resources:
+  - namespace.yaml
+  - ../../base
+
+images:
+  - name: hmsmiraz/techedu-auth-service
+    newTag: main
+  - name: hmsmiraz/techedu-content-service
+    newTag: main
+  - name: hmsmiraz/techedu-gateway
+    newTag: main
+  - name: hmsmiraz/techedu-landing
+    newTag: main
+  - name: hmsmiraz/techedu-admin
+    newTag: main
+  - name: hmsmiraz/techedu-learning-portal
+    newTag: main
+
+secretGenerator:
+  - name: mysql-secret
+    envs:
+      - mysql-secret.env
+  - name: app-secret
+    envs:
+      - app-secret.env
+
+# NOTE: cors-origins and the loadBalancerIP patches below use placeholders
+# until static IPs are reserved for this namespace — see k8s/README.md.
+configMapGenerator:
+  - name: app-config
+    literals:
+      - cors-origins=http://REPLACE_WITH_RESERVED_IP:3000,http://REPLACE_WITH_RESERVED_IP:3001,http://REPLACE_WITH_RESERVED_IP:3002
+
+patches:
+  - target:
+      kind: Service
+      name: gateway
+    patch: |-
+      - op: replace
+        path: /spec/loadBalancerIP
+        value: "REPLACE_WITH_RESERVED_IP"
+  - target:
+      kind: Service
+      name: landing
+    patch: |-
+      - op: replace
+        path: /spec/loadBalancerIP
+        value: "REPLACE_WITH_RESERVED_IP"
+  - target:
+      kind: Service
+      name: admin
+    patch: |-
+      - op: replace
+        path: /spec/loadBalancerIP
+        value: "REPLACE_WITH_RESERVED_IP"
+  - target:
+      kind: Service
+      name: learning-portal
+    patch: |-
+      - op: replace
+        path: /spec/loadBalancerIP
+        value: "REPLACE_WITH_RESERVED_IP"
+  # main (production): real sizing, premium SSD-backed storage class for
+  # actual I/O performance. NOTE: this does not yet include automated
+  # backups (e.g. GCP persistent disk snapshot schedule or Velero) — that's
+  # a real gap worth closing before this holds real user data long-term,
+  # flagging it now rather than pretending this is production-complete.
+  - target:
+      kind: StatefulSet
+      name: mysql
+    patch: |-
+      - op: replace
+        path: /spec/volumeClaimTemplates/0/spec/resources/requests/storage
+        value: "20Gi"
+      - op: add
+        path: /spec/volumeClaimTemplates/0/spec/storageClassName
+        value: "premium-rwo"
