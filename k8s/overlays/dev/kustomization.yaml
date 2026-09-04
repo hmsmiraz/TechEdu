@@ -29,38 +29,17 @@ secretGenerator:
     envs:
       - app-secret.env
 
-# NOTE: cors-origins and the loadBalancerIP patches below use placeholders
-# until static IPs are reserved for this namespace — see k8s/README.md.
+# cors-origins: all three frontends now share one origin (path-routed
+# through the gateway), so CORS just needs that single origin.
 configMapGenerator:
   - name: app-config
     literals:
-      - cors-origins=http://34.47.173.69:3000,http://34.47.173.69:3001,http://34.47.173.69:3002
+      - cors-origins=http://34.47.173.69:8080
 
 patches:
   - target:
       kind: Service
       name: gateway
-    patch: |-
-      - op: replace
-        path: /spec/loadBalancerIP
-        value: "34.47.173.69"
-  - target:
-      kind: Service
-      name: landing
-    patch: |-
-      - op: replace
-        path: /spec/loadBalancerIP
-        value: "34.47.173.69"
-  - target:
-      kind: Service
-      name: admin
-    patch: |-
-      - op: replace
-        path: /spec/loadBalancerIP
-        value: "34.47.173.69"
-  - target:
-      kind: Service
-      name: learning-portal
     patch: |-
       - op: replace
         path: /spec/loadBalancerIP

@@ -138,7 +138,7 @@ pipeline {
                               -t ${DOCKERHUB_NAMESPACE}/techedu-landing:${BRANCH_TAG} \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-landing:${BUILD_TAG_FULL} \
                               --build-arg NEXT_PUBLIC_API_BASE_URL=http://${NAMESPACE_IP}:8080/api \
-                              --build-arg NEXT_PUBLIC_LEARNING_PORTAL_URL=http://${NAMESPACE_IP}:3002 \
+                              --build-arg NEXT_PUBLIC_LEARNING_PORTAL_URL=http://${NAMESPACE_IP}:8080/portal \
                               ./apps/landing
                         '''
                     }
@@ -161,7 +161,7 @@ pipeline {
                               -t ${DOCKERHUB_NAMESPACE}/techedu-learning-portal:${BRANCH_TAG} \
                               -t ${DOCKERHUB_NAMESPACE}/techedu-learning-portal:${BUILD_TAG_FULL} \
                               --build-arg NEXT_PUBLIC_API_BASE_URL=http://${NAMESPACE_IP}:8080/api \
-                              --build-arg NEXT_PUBLIC_LANDING_URL=http://${NAMESPACE_IP}:3000 \
+                              --build-arg NEXT_PUBLIC_LANDING_URL=http://${NAMESPACE_IP}:8080 \
                               ./apps/learning-portal
                         '''
                     }

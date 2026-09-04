@@ -24,8 +24,7 @@ kind: Service
 metadata:
   name: learning-portal
 spec:
-  type: LoadBalancer
-  loadBalancerIP: "REPLACE_WITH_RESERVED_IP"
+  type: ClusterIP
   selector:
     app: learning-portal
   ports:

@@ -24,8 +24,7 @@ kind: Service
 metadata:
   name: landing
 spec:
-  type: LoadBalancer
-  loadBalancerIP: "REPLACE_WITH_RESERVED_IP"
+  type: ClusterIP
   selector:
     app: landing
   ports:
