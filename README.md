@@ -43,22 +43,24 @@ This isn't a tutorial project wired together from defaults — every layer, from
 ## Architecture
 
 Three Next.js frontends and two FastAPI backend services sit behind a single Nginx gateway per environment, which handles path-based routing to every app and proxies API calls to the correct microservice. This means each environment needs only **one external IP and one entry point**, regardless of how many services run behind it. Backend services use JWT authentication and connect to a dedicated MySQL instance per environment, with retry-hardened startup logic to handle database availability timing during pod restarts.
-                 ┌─────────────────────────┐
-                 │   Nginx Gateway (1 IP)  │
-                 └────────────┬────────────┘
-          ┌───────────────────┼───────────────────┐
-          ▼                   ▼                   ▼
-    Landing (/)          Admin (/admin)     Portal (/portal)
-                                                    │
-                         ┌──────────────────────────┘
-                         ▼
-                ┌─────────────────┐      ┌──────────────────┐
-                │  auth-service   │◄────►│ content-service   │
-                └────────┬────────┘      └────────┬─────────┘
-                         └──────────┬──────────────┘
-                                    ▼
-                                MySQL
 
+```
+                    ┌─────────────────────┐
+                    │  Nginx Gateway (1 IP) │
+                    └───────────┬───────────┘
+              ┌─────────────────┼─────────────────┐
+              ▼                 ▼                 ▼
+        Landing (/)      Admin (/admin)     Portal (/portal)
+                                 │
+                    ┌────────────┴────────────┐
+                    ▼                          
+          ┌──────────────────┐       ┌──────────────────┐
+          │   auth-service    │◄─────►│  content-service  │
+          └─────────┬─────────┘       └─────────┬─────────┘
+                    └────────────┬───────────────┘
+                                 ▼
+                              MySQL
+```
 
 ## Application Screens
 
