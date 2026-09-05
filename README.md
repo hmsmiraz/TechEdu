@@ -60,6 +60,20 @@ Three Next.js frontends and two FastAPI backend services sit behind a single Ngi
                                 MySQL
 
 
+## Application Screens
+
+**Landing page** — public-facing marketing site with sign-up flow
+![Landing page](./Images/Landing%20Page.png)
+
+**Student portal** — where approved students access their course modules
+![Student portal](./Images/Student%20Portal.png)
+
+**Admin panel — Users** — approve signups and manage student accounts
+![Admin portal users](./Images/Admin%20Portal%20-%20Users.png)
+
+**Admin panel — Content** — manage course modules and resources
+![Admin portal content](./Images/Admin%20Portal%20-%20Content.png)
+
 ## CI/CD Pipeline
 
 Jenkins runs a multibranch pipeline triggered automatically on every push to `dev`, `staging`, or `main`. Each run builds and tests all five services in parallel, builds Docker images tagged both by branch and by an immutable build number, pushes them to Docker Hub, and deploys directly to the matching Kubernetes namespace via `kubectl apply -k`.
