@@ -49,7 +49,7 @@ spec:
                   name: app-config
                   key: cors-origins
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: "http://observability-agent:4318"
+              value: "http://observability-agent.observability:4318"
           readinessProbe:
             httpGet:
               path: /health

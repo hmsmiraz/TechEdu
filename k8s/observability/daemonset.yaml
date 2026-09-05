@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: observability-agent
+  namespace: observability
+spec:
+  selector:
+    matchLabels:
+      app: observability-agent
+  template:
+    metadata:
+      labels:
+        app: observability-agent
+    spec:
+      serviceAccountName: observability-agent
+      containers:
+        - name: alloy
+          image: grafana/alloy:v1.5.1
+          args:
+            - run
+            - /etc/alloy/config.alloy
+            - --server.http.listen-addr=0.0.0.0:12345
+            - --storage.path=/var/lib/alloy/data
+          env:
+            - name: MASTER_TEMPO_ENDPOINT
+              value: "10.160.0.13:4317"
+            - name: MASTER_PROMETHEUS_URL
+              value: "http://10.160.0.13:9090/api/v1/write"
+            - name: MASTER_LOKI_URL
+              value: "http://10.160.0.13:3100/loki/api/v1/push"
+          ports:
+            - containerPort: 4317
+              name: otlp-grpc
+            - containerPort: 4318
+              name: otlp-http
+          volumeMounts:
+            - name: config
+              mountPath: /etc/alloy
+            - name: data
+              mountPath: /var/lib/alloy/data
+      volumes:
+        - name: config
+          configMap:
+            name: observability-agent-config
+        - name: data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: observability-agent
+  namespace: observability
+spec:
+  selector:
+    app: observability-agent
+  ports:
+    - name: otlp-grpc
+      port: 4317
+      targetPort: 4317
+    - name: otlp-http
+      port: 4318
+      targetPort: 4318

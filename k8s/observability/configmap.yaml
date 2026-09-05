@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: observability-agent-config
+  namespace: observability
+data:
+  config.alloy: |
+    // ============================================================================
+    // TechEdu LMS — observability agent (Grafana Alloy) — Kubernetes DaemonSet
+    //
+    // Runs as one pod per GKE node, discovers every pod across dev/staging/main
+    // namespaces, and ships metrics + logs + traces to the master
+    // Prometheus/Loki/Tempo running on the Jenkins VM.
+    // ============================================================================
+
+    // ---- Receive OTLP traces + metrics from auth-service/content-service pods ----
+    otelcol.receiver.otlp "app_services" {
+      grpc {
+        endpoint = "0.0.0.0:4317"
+      }
+      http {
+        endpoint = "0.0.0.0:4318"
+      }
+      output {
+        metrics = [otelcol.processor.batch.default.input]
+        traces  = [otelcol.processor.batch.default.input]
+      }
+    }
+
+    otelcol.processor.batch "default" {
+      output {
+        metrics = [otelcol.exporter.prometheus.to_master.input]
+        traces  = [otelcol.exporter.otlp.to_tempo.input]
+      }
+    }
+
+    // ---- Traces -> Tempo on the Jenkins VM ----
+    otelcol.exporter.otlp "to_tempo" {
+      client {
+        endpoint = sys.env("MASTER_TEMPO_ENDPOINT")
+
+        tls {
+          insecure = true
+        }
+      }
+    }
+
+    // ---- Metrics -> Prometheus remote_write on the Jenkins VM ----
+    otelcol.exporter.prometheus "to_master" {
+      forward_to = [prometheus.remote_write.to_master.receiver]
+    }
+
+    prometheus.remote_write "to_master" {
+      endpoint {
+        url = sys.env("MASTER_PROMETHEUS_URL")
+      }
+    }
+
+    // ---- Logs: discover every pod across the whole cluster (all namespaces) ----
+    discovery.kubernetes "pods" {
+      role = "pod"
+    }
+
+    discovery.relabel "pods" {
+      targets = discovery.kubernetes.pods.targets
+
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label  = "namespace"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        target_label  = "pod"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_name"]
+        target_label  = "container"
+      }
+
+      rule {
+        source_labels = ["__meta_kubernetes_pod_node_name"]
+        target_label  = "node"
+      }
+    }
+
+    loki.source.kubernetes "pods" {
+      targets    = discovery.relabel.pods.output
+      forward_to = [loki.write.to_master.receiver]
+    }
+
+    loki.write "to_master" {
+      endpoint {
+        url = sys.env("MASTER_LOKI_URL")
+      }
+    }
