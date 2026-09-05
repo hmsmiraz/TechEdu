@@ -56,6 +56,29 @@ data:
       }
     }
 
+    // ---- Pod-level resource metrics (CPU/memory/network per container) ----
+    // via each node's kubelet cAdvisor endpoint.
+    discovery.kubernetes "nodes" {
+      role = "node"
+    }
+
+    prometheus.scrape "cadvisor" {
+      targets      = discovery.kubernetes.nodes.targets
+      scheme       = "https"
+      metrics_path = "/metrics/cadvisor"
+
+      authorization {
+        type             = "Bearer"
+        credentials_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+      }
+
+      tls_config {
+        insecure_skip_verify = true
+      }
+
+      forward_to = [prometheus.remote_write.to_master.receiver]
+    }
+
     // ---- Logs: discover every pod across the whole cluster (all namespaces) ----
     discovery.kubernetes "pods" {
       role = "pod"
